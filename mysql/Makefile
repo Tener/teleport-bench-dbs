@@ -1,23 +1,37 @@
 
 # defaults
 DBNAME ?= mysql
-DBPORT ?= 3306
+DBPORT ?= 33061
 MYSQL_COMMAND ?= mysql
 MYSQLDUMP_COMMAND ?= mysqldump
+MYSQL_USER ?= tener
+CONNPARAMS_EXTRA ?= 
 
 env-mysql:
 	@echo "export DBNAME=mysql"
-	@echo "export DBPORT=3306"
+	@echo "export DBPORT=33061"
 	@echo "export MYSQL_COMMAND=mysql"
 	@echo "export MYSQLDUMP_COMMAND=mysqldump"
+	@echo "export MYSQL_USER=tener"
+	@echo "export CONNPARAMS_EXTRA="
 
 env-mariadb:
 	@echo "export DBNAME=mariadb"
 	@echo "export DBPORT=33060"
 	@echo "export MYSQL_COMMAND=mariadb"
 	@echo "export MYSQLDUMP_COMMAND=mariadb-dump"
+	@echo "export MYSQL_USER=tener"
+	@echo "export CONNPARAMS_EXTRA="
 
-CONNPARAMS ?= --user tener --port $(DBPORT) --host localhost --protocol TCP
+env-mysql-direct:
+	@echo "export DBNAME=mysql"
+	@echo "export DBPORT=13306"
+	@echo "export MYSQL_COMMAND=mysql"
+	@echo "export MYSQLDUMP_COMMAND=mysqldump"
+	@echo "export MYSQL_USER=root"
+	@echo "export CONNPARAMS_EXTRA=--password=MYSQL_SECRET_PASSWORD"
+
+CONNPARAMS ?= --user $(MYSQL_USER) --port $(DBPORT) --host localhost --protocol TCP $(CONNPARAMS_EXTRA)
 CONNPARAMS_DB ?= $(CONNPARAMS) --database mysql
 
 login:
@@ -43,4 +57,4 @@ restore-backup:
 	$(MYSQL_COMMAND) $(CONNPARAMS_DB) < db_mysql.backup.sql
 
 read-benchmark:
-	time $(MYSQL_COMMAND) $(CONNPARAMS_DB) -N -e "USE benchmark; SELECT * FROM customers;" > /dev/null
+	time $(MYSQL_COMMAND) $(CONNPARAMS_DB) --raw --batch -N -e "USE benchmark; SELECT * FROM customers;" > /dev/null
