@@ -1,4 +1,4 @@
-# teleport-bench-dbs
+# Postgres
 
 See `Makefile` for suitable targets. 
 
